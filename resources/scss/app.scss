@@ -1,0 +1,137 @@
+@import '~bootstrap/scss/bootstrap';
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: beige;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+.card {
+    width: 400px;
+    min-height: 400px;
+    margin: 20px;
+    border: 0;
+
+    .titolo {
+        width: 400px;
+        height: 80px;
+        text-align: center;
+        padding: 8px;
+
+
+        h3 {
+            a {
+                text-decoration: none;
+                color: black;
+                font-size: 25px;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    .card-img {
+
+        img {
+            width: 400px;
+            height: 320px;
+            object-fit: cover;
+        }
+    }
+
+    .edit,
+    .delete {
+        width: 400px;
+        height: 30px;
+        margin: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        a {
+            color: black;
+            font-size: 18px;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+        }
+    }
+
+}
+
+h2 {
+    padding: 20px;
+}
+
+.comic {
+
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+
+    .thumb {
+        width: 50%;
+        height: 500px;
+
+        img {
+            width: 100%;
+            object-fit: cover;
+            height: 500px;
+        }
+
+    }
+
+    .description {
+        width: 50%;
+        padding: 0 0 20px 20px;
+    }
+}
+
+.create {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+        margin: 10px;
+    }
+
+    label {
+        padding: 5px;
+        font-size: 18px;
+    }
+
+    input,
+    textarea {
+        background-color: rgb(195, 241, 255);
+        border: rgb(42, 201, 249);
+    }
+
+    .send {
+        background-color: rgb(63, 63, 63);
+        color: #fff;
+        margin-top: 10px;
+
+        &:hover {
+            background-color: black;
+        }
+    }
+
+}

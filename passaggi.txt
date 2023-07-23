@@ -1,0 +1,293 @@
+
+SHOW > dopo aver messo in un link il contenuto
+        creiamo una rotta devo passare l'id per sapere dov l'utente ha cliccato
+
+            <h3>
+                <a href="{{ route('comic.show', $comic->id) }}"> {{ $comic->title }}</a>
+            </h3>
+
+    > in web.php richiamiamo la rotta
+
+        Route :: get("/show/{id}", [MainController :: class, "show"]) -> name("comic.show");
+
+    > vado nel MainController e creo il metodo SHOW per controllare che funzioni posso  fare dd($id)
+
+     public function show($id){
+
+        $comic = Comic :: FindOrFail($id);
+
+        return view("comic.show", compact("comic"));
+    }
+
+
+    > creo un fille show.blade.php magari dentro un folder e qui rappresentiamo le info specifiche di quel elemento
+
+
+        <h2 class="text-center my-3">{{ $comic->title }}</h2>
+
+        <div class="comic d-flex">
+
+            <div class="thumb">
+
+                <img src="{{ $comic->thumb }}" alt="l'immagine non è presente">
+
+            </div>
+
+            <div class="description">
+
+            <h5>Description:</h5>
+            <p> {{ $comic->description }}</p>
+
+            <div>Prezzo: {{ $comic->price }}</div>
+
+            <div> Serie:{{ $comic->series }}</div>
+
+            <div>Data di uscita: {{ $comic->sale_date }}</div>
+
+            <div>Tipologia: {{ $comic->type }}</div>
+
+        </div>
+
+
+
+CREATE > si parte dalla view creiamo in home un tag a con relativa rotta
+
+        <a href="{{route('comic.create')}}">Aggiungi</a>
+
+        > richiamiamo la rotta in web.php
+
+        Route :: get("/create", [MainController :: class, "create"]) -> name("comic.create");
+
+
+        > andiamo nel MainController
+
+
+        public function create(){
+
+        return view("comic.create");
+
+        }
+
+        > creo nella view un elemento create.blade.php possibilmente nel folder
+          creo un form
+
+        <h2>New Comic</h2>
+
+         <form class="d-flex flex-column text-center" method="POST" action="{{route("comic.store")}}"> (metodo post, creo rotta per lo store che invierà i dati al database)
+
+            @csrf (per la sicurezza sempre da inserire)
+
+            <label for="title">Titlo</label>
+            <input type="text" name="title">
+
+            <label for="thumb">Immagine</label>
+            <input type="text" name="thumb">
+
+            <label for="description">description</label>
+            <textarea name="description" cols="30" rows="10"></textarea>
+
+            <label for="price">Prezzo</label>
+            <input type="text" name="price">
+
+            <label for="series">Serie</label>
+            <input type="text" name="series">
+
+            <label for="sale_date">Data di rilascio</label>
+            <input type="date" name="sale_date">
+
+            <label for="type">Tipo</label>
+            <input type="text" name="type">
+
+            <input class="send" type="submit" value="Create">
+
+        </form>
+
+
+    > richiamo la rotta dello store nel web.php
+
+        Route :: post("/create_comic", [MainController :: class, "store"]) -> name("comic.store"); (questa volta in post perchè dobbiamo inviare i dati)
+
+
+   > andiamo nel MainController spediamo i dati in tabella
+
+        public function store(Request $request){
+
+        $data =  $request -> all();
+
+        $comic = Comic :: create($data);
+        return redirect() -> route("comic.show", $comic -> id); (ritorno allo store con il nuovo elemento)
+    }
+
+
+EDIT > creiamo il link edit sul nostro contenuto e creiamo la rotta
+
+         <a href="{{ route('comic.edit', $comic->id) }}">Edit</a>
+
+
+     > andiamo in web.php e richiamiamo la rotta
+
+     Route :: get("/edit/{id}", [MainController :: class, "edit"]) -> name("comic.edit");
+
+
+    > creiamo un file edit in view che sarà uguale alla create quindi copio e incollo
+
+    > andiamo nel MainController
+
+        public function edit($id){
+
+        $comic = Comic :: FindOrFail($id);
+
+        return view("comic.edit", compact("comic"));
+        }
+
+    > torniamo nella view e mettiamo i value così possiamo editare e fare cambiamenti, ol method Put e passiamo l'Id nell'action, creiamo la rotta update
+
+
+    <form class="d-flex flex-column text-center"
+    method="POST"
+    action="{{route("comic.update", $comic -> id)}}">
+
+        @csrf
+        @method("PUT")
+
+        <label for="title">Titlo</label>
+        <input type="text" name="title" value="{{$comic -> title}}">
+
+        <label for="thumb">Immagine</label>
+        <input type="text" name="thumb" value="{{$comic -> thumb}}">
+
+        <label for="description">description</label>
+        <textarea name="description" cols="30" rows="10">{{$comic -> description}}</textarea> (qui non c'e il value si mette dentro il tag)
+
+        <label for="price">Prezzo</label>
+        <input type="text" name="price" value="{{$comic -> price}}">
+
+        <label for="series">Serie</label>
+        <input type="text" name="series" value="{{$comic -> series}}">
+
+        <label for="sale_date">Data di rilascio</label>
+        <input type="date" name="sale_date" value="{{$comic -> sale_date}}">
+
+        <label for="type">Tipo</label>
+        <input type="text" name="type" value="{{$comic -> type}}">
+
+        <input class="send" type="submit" value="Update">
+
+    </form>
+
+
+    > andiamo in web.php e richiamiamo la rotta
+
+        Route :: put("/update/{id}", [MainController :: class, "update"]) -> name("comic.update");
+
+
+    > andiamo nel MainController
+
+        public function update(Request $request, $id) {
+
+            $data = $request -> all();
+
+            $comic = Comic :: findOrFail($id);
+
+            $comic -> update($data);
+
+            return redirect() -> route('comic.show', $comic -> id);
+        }
+
+
+
+DELETE > creiamo il form e la relativa route in home
+
+
+                <form class="delete" method="POST"
+                    action="{{ route('delete', $comic -> id) }}"
+                    onsubmit="return formSend(event)"> (non so cosa serve onsubmit)
+
+                    @csrf
+                    @method('DELETE')
+
+                    <input type="submit" value="DELETE">
+
+                </form>
+
+        > andiamo in web.php e richiamiamo la rotta
+
+            Route :: delete('/delete/{id}', [MainController :: class, 'delete'])
+            -> name('delete');
+
+        > andiamo nel MainController
+
+            public function delete($id) {
+
+            $comic = Comic :: findOrFail($id);
+
+            $comic -> delete();
+
+            return redirect() -> route("index");
+        }
+
+
+VALIDATION >  nel MainController e nello store e nell'update sostituiamo all() con  validate() e andiamo sulle validazioni di Laravel https://laravel.com/docs/10.x/validation#available-validation-rules
+
+
+
+
+            public function store(Request $request){
+
+                $data =  $request -> validate(
+                [
+                    "title" => "required|max: 100",
+                    "description" => "nullable|max: 10000",
+                    "thumb" => "required|min:3|max:255",
+                    "price" => "required|min:1|max:32",
+                    "series" => "required|min:1|max:64",
+                    "sale_date" => "required|date|max:64",
+                    "type" => "required|min:1|max:64"
+                ],
+                [
+                        "title.required" => "il titolo è necessario",
+                        "title.max" => "il titolo non può superare i 100 caratteri,
+                    ] (per customizzare le validations per ogni combinazione bisogna cambiare)
+                );
+
+                $comic = Comic :: create($data);
+                return redirect() -> route("comic.show", $comic -> id);
+            }
+
+
+            public function update(Request $request, $id) {
+
+                $data = $request -> validate(
+                    [
+                        "title" => "required|max: 100",
+                        "description" => "nullable|max: 10000",
+                        "thumb" => "required|min:3|max:255",
+                        "price" => "required|min:1|max:32",
+                        "series" => "required|min:1|max:64",
+                        "sale_date" => "required|date|max:64",
+                        "type" => "required|min:1|max:64"
+                    ],
+                    [
+                        "title.required" => "il titolo è necessario",
+                        "title.max" => "il titolo non può superare i 100 caratteri,
+                    ]
+                );
+
+                $comic = Comic :: findOrFail($id);
+
+                $comic -> update($data);
+
+                return redirect() -> route('comic.show', $comic -> id);
+            }
+
+        > inseriamo l'if nel main.blade.php
+
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
